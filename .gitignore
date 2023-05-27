@@ -1,160 +1,231 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import numpy as np
+import xlrd
+import pandas as pd
+import time
 
-# C extensions
-*.so
+start = time.clock()
+def read(file): 
+    wb = xlrd.open_workbook(filename=file) 
+    sheet = wb.sheet_by_index(0) 
+    rows = sheet.nrows 
+cols = sheet.ncols
+    all_content = [] 
+    for j in range(1, nclos):  
+        temp = []
+        for i in range(1, rows):
+            cell = sheet.cell_value(i, j) 
+            temp.append(cell)
+        all_content.append(temp)  
+        temp = []
+    return np.array(all_content)
+ 
+def dataDirection_1(datas):
+    return np.max(datas) - datas  
+ 
+def dataDirection_2(datas, x_best):
+    temp_datas = datas - x_best
+    M = np.max(abs(temp_datas))
+    answer_datas = 1 - abs(datas - x_best) / M  
+    return answer_datas
+ 
+def temp2(datas):
+    K = np.power(np.sum(pow(datas, 2), axis=1), 0.5)
+    for i in range(0, K.size):
+        for j in range(0, datas[i].size):
+            datas[i, j] = datas[i, j] / K[i] 
+    return datas
+ 
+def temp3(answer2):
+    list_max = np.array(
+        [np.max(answer2[0, :]), np.max(answer2[1, :]), np.max(answer2[2, :])]) 
+    list_min = np.array(
+        [np.min(answer2[0, :]), np.min(answer2[1, :]), np.min(answer2[2, :])])  
+    max_list = []  
+    min_list = []  
+    answer_list = []  
+    for k in range(0, np.size(answer2, axis=1)):  
+        max_sum = 0
+        min_sum = 0
+        for q in range(0, row):  
+            max_sum += np.power(answer2[q, k] - list_max[q], 2)  
+            min_sum += np.power(answer2[q, k] - list_min[q], 2)  
+        max_list.append(pow(max_sum, 0.5))
+        min_list.append(pow(min_sum, 0.5))
+        answer_list.append(min_list[k] / (min_list[k] + max_list[k]))  
+        max_sum = 0
+min_sum = 0
+    answer = np.array(answer_list)  
+    return (answer / np.sum(answer))
+ 
+def main():
+    file = 'C:/Users/Dengbiao/Desktop/topsis算法各属性数值及得分.xls'
+    answer1 = read(file) 
+    answer2 = []
+    for i in range(0, ncols-1):  #
+        answer = None
+        if (i == 0):  
+            answer = answer1[0]
+        elif (i == 1):  
+            answer = dataDirection_2(answer1[1], 1)
+        elif (i == 2): 
+            answer = dataDirection_1(answer1[2])
+        answer2.append(answer)
+    answer2 = np.array(answer2)  
+    answer3 = temp2(answer2)  
+    answer4 = temp3(answer3)  
+    data = pd.DataFrame(answer4) 
+    writer = pd.ExcelWriter('C:/Users/DengBiao/Desktop/得分.xls') 
+    data.to_excel(writer, 'Sheet1', float_format='%.5f') 
+    writer.save()
+    writer.close()
+main()
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+import numpy as np
+import operator
+import matplotlib.pyplot as plt
+import collections
+  
+def createDateSet():
+    group = [1.0,1.1],[1.0,1.0],[0,0],[0,0.1]
+    group = np.asarray(group)
+    labels = ['A','A','B','B']
+    return group, labels
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+def classify0(inX, dataSet, labels, k):
+    dataSize = dataSet.shape[0] 
+    diffMat = np.tile(inX, (dataSize, 1)) - dataSet
+    sqDiffMat = diffMat**2
+    sqDistances = sqDiffMat.sum(axis=1)
+    distances = sqDistances**0.5
+    sortedDistIndicies = distances.argsort()
+    classCount = {}
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndicies[i]]
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+    print("sortedClassCount:",sortedClassCount)
+    return sortedClassCount[0][0]
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+def classify1(inX, dataSet, labels, k):
+    distance = np.sum((inX - dataSet)**2, axis=1)**0.5
+    print("distance:",distance)
+    k_labels = [labels[index] for index in distance.argsort()[0:k]]
+    print("k_labels:",k_labels)
+label = collections.Counter(k_labels).most_common(1)[0][0]
+return label
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+if __name__ == '__main__':
+    group, labels = createDateSet()
+    # print(group.shape)
+    group.reshape(4,2)
+    plt.scatter(group[:,0],group[:,1],marker='+')
+    plt.show()
+    # print(group[:,0])
+print(classify1([0,0],group,labels,3))
+end = time.clock()
+runtime = end – start
+print("运行时间：", runTime, "秒")
 
-# Translations
-*.mo
-*.pot
+register(
+    id="GridWorld-v0",
+    entry_point="Grid_MDP:GridEnv",
+    max_episode_steps=200,
+    reward_threshold=100.0,
+)
+grid = gym.make('GridWorld-v0')
+states = grid.env.getStates()  
+actions = grid.env.getAction()  
+gamma = grid.env.getGamma()  
+best = dict()
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+def read_best():
+    f = open("best.txt")
+    for line in f:
+        line = line.strip()
+        if len(line) == 0: continue
+        eles = line.split(":")
+        best[eles[0]] = float(eles[1])
 
-# Flask stuff:
-instance/
-.webassets-cache
+def compute_error(qfunc):
+    sum1 = 0.0
+    for key in qfunc:
+        error = qfunc[key] - best[key]
+        sum1 += error * error
+return sum1
 
-# Scrapy stuff:
-.scrapy
+def greedy(qfunc, state):
+    amax = 0
+    key = "%d_%s" % (state, actions[0])
+    qmax = qfunc[key]
+    for i in range(len(actions)):  
+        key = "%d_%s" % (state, actions[i])
+        q = qfunc[key]
+        if qmax < q:
+            qmax = q
+            amax = i
+    return actions[amax]
 
-# Sphinx documentation
-docs/_build/
+def epsilon_greedy(qfunc, state, epsilon):
+    amax = 0
+    key = "%d_%s" % (state, actions[0])
+    qmax = qfunc[key]
+    for i in range(len(actions)):  
+        key = "%d_%s" % (state, actions[i])
+        q = qfunc[key]
+        if qmax < q:
+            qmax = q
+            amax = i
+    pro = [0.0 for i in range(len(actions))]
+    pro[amax] += 1 - epsilon
+    for i in range(len(actions)):
+        pro[i] += epsilon / len(actions)
+    r = random.random()
+    s = 0.0
+    for i in range(len(actions)):
+        s += pro[i]
+        if s >= r: return actions[i]  
+    return actions[len(actions) - 1]
 
-# PyBuilder
-.pybuilder/
-target/
+import sys
+import gym
+from qlearning import *
+import time
+from gym import wrappers
 
-# Jupyter Notebook
-.ipynb_checkpoints
+if __name__ == "__main__":
+    sleeptime = 1
+    terminate_states = grid.env.getTerminate_states()
+    read_best()
+    qfunc = qlearning(num_iter1=500, alpha=0.2, epsilon=0.2)
+    time.sleep(sleeptime)
+    print("the learned policy is:")
+    for i in range(len(states)):
+        if states[i] in terminate_states:
+            print("the state %d is terminate_states" % (states[i]))
+        else:
+            print("the policy of state %d is (%s)" % (states[i], greedy(qfunc, states[i])))
+    s0 = 1                                                                                                                               
+    grid.env.setAction(s0)
+    for i in range(7):
+        s0 = grid.reset()
+        grid.render()
+        time.sleep(sleeptime)
+        t = False
+        count = 0
+        if s0 in terminate_states:
+            print("reach the terminate state %d" % (s0))
+        else:
+            while False == t and count < 100:
+                a1 = greedy(qfunc, s0)
+                print(s0, a1)
+                grid.render()
+                time.sleep(sleeptime)
 
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/#use-with-ide
-.pdm.toml
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+                s1, r, t, i = grid.step(a1)
+                if True == t:
+                    print(s1)
+                    grid.render()
+                    time.sleep(sleeptime)
+                    print("reach the terminate state %d" % (s1))
+                s0 = s1
+                count += 1
